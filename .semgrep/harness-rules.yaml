@@ -1,0 +1,119 @@
+rules:
+  # ── XSS ────────────────────────────────────────────────────────────────────
+
+  - id: harness-no-innerhtml
+    pattern: $EL.innerHTML = $CONTENT
+    message: "XSS: Use Obsidian createEl/createDiv API instead of innerHTML."
+    languages: [typescript]
+    severity: ERROR
+
+  - id: harness-no-outerhtml
+    pattern: $EL.outerHTML = $CONTENT
+    message: "XSS: Use Obsidian createEl API instead of outerHTML."
+    languages: [typescript]
+    severity: ERROR
+
+  - id: harness-no-insertadjacenthtml
+    pattern: $EL.insertAdjacentHTML($POS, $CONTENT)
+    message: "XSS: Use Obsidian createEl API instead of insertAdjacentHTML."
+    languages: [typescript]
+    severity: ERROR
+
+  # ── API 우회 / SSRF ─────────────────────────────────────────────────────────
+
+  - id: harness-no-raw-fetch
+    pattern: fetch($URL, ...)
+    message: "Use DaemonApiClient wrapper. Raw fetch() is prohibited."
+    languages: [typescript]
+    severity: WARNING
+
+  - id: harness-no-xmlhttprequest
+    pattern: new XMLHttpRequest()
+    message: "Use DaemonApiClient wrapper. Raw XMLHttpRequest is prohibited."
+    languages: [typescript]
+    severity: WARNING
+
+  - id: harness-no-hardcoded-url
+    patterns:
+      - pattern: fetch("http://...", ...)
+      - pattern: fetch("https://...", ...)
+    message: "SSRF: Do not hardcode URLs. Use configured daemonBaseUrl from settings."
+    languages: [typescript]
+    severity: ERROR
+
+  # ── 입력 검증 ──────────────────────────────────────────────────────────────
+
+  - id: harness-validate-before-api
+    patterns:
+      - pattern: this.apiClient.createNode($INPUT)
+      - pattern-not-inside: |
+          if (this.validator.validate($INPUT)) { ... }
+    message: Must call validator.validate() before API calls.
+    languages: [typescript]
+    severity: ERROR
+
+  # ── expected_version 누락 ──────────────────────────────────────────────────
+
+  - id: harness-patch-requires-expected-version
+    patterns:
+      - pattern: |
+          this.apiClient.updateNode($ID, $PATCH)
+      - pattern-not: |
+          this.apiClient.updateNode($ID, {..., expected_version: $V, ...})
+    message: "PATCH must include expected_version. Omitting it will be rejected by the daemon."
+    languages: [typescript]
+    severity: ERROR
+
+  - id: harness-delete-requires-expected-version
+    patterns:
+      - pattern: |
+          this.apiClient.deleteNode($ID)
+      - pattern-not: |
+          this.apiClient.deleteNode($ID, $VERSION)
+    message: "DELETE must include expected_version. Omitting it will be rejected by the daemon."
+    languages: [typescript]
+    severity: ERROR
+
+  # ── Obsidian API 오용 ──────────────────────────────────────────────────────
+
+  - id: harness-no-obsidian-in-core
+    patterns:
+      - pattern: import { ... } from "obsidian"
+      - pattern-inside: |
+          // @path: src/core/**
+    message: "Architecture violation: core/ must not depend on Obsidian API (breaks testability)."
+    languages: [typescript]
+    severity: ERROR
+
+  - id: harness-no-direct-style
+    pattern: $EL.style.$PROP = $VALUE
+    message: "Use Obsidian CSS variables instead of direct inline styles."
+    languages: [typescript]
+    severity: WARNING
+
+  # ── 민감 정보 노출 ─────────────────────────────────────────────────────────
+
+  - id: harness-no-console-log-response
+    patterns:
+      - pattern: console.log(..., $RESP, ...)
+      - metavariable-pattern:
+          metavariable: $RESP
+          patterns:
+            - pattern-either:
+                - pattern: $X.diagnostics
+                - pattern: $X.blocked_reasons
+                - pattern: $X.integrity_report
+    message: "Do not log sensitive daemon response fields. Use structured error reporting instead."
+    languages: [typescript]
+    severity: WARNING
+
+  - id: harness-no-hardcoded-token
+    patterns:
+      - pattern-either:
+          - pattern: |
+              const $VAR = "Bearer ..."
+          - pattern: |
+              Authorization: "Bearer ..."
+    message: "Hardcoded token detected. Use settings-based configuration."
+    languages: [typescript]
+    severity: ERROR

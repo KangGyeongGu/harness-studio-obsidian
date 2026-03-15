@@ -1,0 +1,10 @@
+{
+  "id": "harness-studio",
+  "name": "Harness Studio",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "UX for creating, editing, validating, and searching SSOT annotations",
+  "author": "KangGyeongGu",
+  "authorUrl": "https://github.com/KangGyeongGu",
+  "isDesktopOnly": true
+}

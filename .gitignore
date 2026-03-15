@@ -1,0 +1,72 @@
+# ─── AI / Claude Code ──────────────────────────────────────────────────────
+# Team assets (.claude/agents, skills, rules, hooks, CLAUDE.md, settings.json) are committed.
+# Only session artifacts and personal settings are excluded.
+.claude/settings.local.json
+.claude/status.json
+.claude/plans/*
+.claude/reports/*
+!.claude/plans/archive/
+!.claude/reports/archive/
+!.claude/plans/.gitkeep
+!.claude/reports/.gitkeep
+agent-system.md
+
+# ─── Design / Reference docs ───────────────────────────────────────────────
+architecture.md
+references.md
+obsidian-plugin-references.md
+
+# ─── Node.js / npm ─────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+
+# ─── TypeScript ────────────────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ─── Build output ──────────────────────────────────────────────────────────
+# Obsidian plugin compiled output
+main.js
+main.js.map
+styles.css
+
+# ─── Test & Coverage ───────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# StrykerJS mutation testing
+.stryker-tmp/
+stryker-reports/
+
+# ─── Environment ───────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Editor ────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── macOS ─────────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ─── Logs ──────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ─── Obsidian (dev vault) ──────────────────────────────────────────────────
+# Uncomment if you have a test vault in the project
+# test-vault/
